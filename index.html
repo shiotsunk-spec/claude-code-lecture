@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Code セットアップ講座 — Step 1</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0F172A;
+    color: #E2E8F0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+    line-height: 1.8;
+    padding: 40px 20px;
+  }
+
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  h1 {
+    color: #F59E0B;
+    font-size: 2rem;
+    text-align: center;
+    margin-bottom: 8px;
+    text-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
+  }
+
+  .goal {
+    text-align: center;
+    font-size: 1.1rem;
+    color: #94A3B8;
+    margin-bottom: 48px;
+    padding: 16px 24px;
+    background: rgba(245, 158, 11, 0.08);
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    border-radius: 12px;
+  }
+
+  .goal strong { color: #F59E0B; }
+
+  .step {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 32px;
+    margin-bottom: 32px;
+  }
+
+  .step-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .step-number {
+    background: #F59E0B;
+    color: #0F172A;
+    font-weight: 800;
+    font-size: 0.85rem;
+    padding: 4px 14px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+
+  .step-number.prep {
+    background: #64748B;
+    color: #E2E8F0;
+  }
+
+  .step-number.ai {
+    background: linear-gradient(135deg, #F59E0B, #22C55E);
+    color: #0F172A;
+  }
+
+  h2 {
+    color: #F8FAFC;
+    font-size: 1.3rem;
+  }
+
+  h3 {
+    color: #F59E0B;
+    font-size: 1rem;
+    margin: 24px 0 12px 0;
+  }
+
+  h4 {
+    color: #CBD5E1;
+    font-size: 0.95rem;
+    margin: 20px 0 10px 0;
+  }
+
+  p { margin-bottom: 12px; }
+
+  .cmd {
+    position: relative;
+    background: #1E293B;
+    border: 1px solid rgba(245, 158, 11, 0.25);
+    border-radius: 10px;
+    padding: 14px 50px 14px 18px;
+    margin: 12px 0 16px 0;
+    font-family: 'SF Mono', 'Fira Code', 'Menlo', monospace;
+    font-size: 0.9rem;
+    color: #FDE68A;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+
+  .cmd.ai-cmd {
+    border-color: rgba(34, 197, 94, 0.4);
+    background: linear-gradient(135deg, #1E293B, rgba(34, 197, 94, 0.05));
+  }
+
+  .cmd.ai-cmd .ai-label {
+    position: absolute;
+    top: -10px;
+    left: 14px;
+    background: #22C55E;
+    color: #0F172A;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 1px 8px;
+    border-radius: 4px;
+  }
+
+  .copy-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: rgba(245, 158, 11, 0.15);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    color: #F59E0B;
+    font-size: 0.75rem;
+    padding: 4px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .copy-btn:hover {
+    background: rgba(245, 158, 11, 0.3);
+  }
+
+  .copy-btn.copied {
+    background: rgba(34, 197, 94, 0.2);
+    border-color: rgba(34, 197, 94, 0.4);
+    color: #22C55E;
+  }
+
+  .warn {
+    background: rgba(245, 158, 11, 0.1);
+    border-left: 3px solid #F59E0B;
+    padding: 12px 16px;
+    border-radius: 0 8px 8px 0;
+    margin: 12px 0;
+    font-size: 0.9rem;
+    color: #FDE68A;
+  }
+
+  .info {
+    background: rgba(59, 130, 246, 0.1);
+    border-left: 3px solid #3B82F6;
+    padding: 12px 16px;
+    border-radius: 0 8px 8px 0;
+    margin: 12px 0;
+    font-size: 0.9rem;
+    color: #93C5FD;
+  }
+
+  .ok {
+    background: rgba(34, 197, 94, 0.1);
+    border-left: 3px solid #22C55E;
+    padding: 12px 16px;
+    border-radius: 0 8px 8px 0;
+    margin: 12px 0;
+    font-size: 0.9rem;
+    color: #86EFAC;
+  }
+
+  .ai-box {
+    background: rgba(34, 197, 94, 0.08);
+    border: 1px solid rgba(34, 197, 94, 0.2);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin: 12px 0;
+    font-size: 0.9rem;
+    color: #86EFAC;
+  }
+
+  .ai-box strong { color: #22C55E; }
+
+  ol, ul {
+    margin: 8px 0 12px 24px;
+  }
+
+  li { margin-bottom: 6px; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 12px 0;
+    font-size: 0.9rem;
+  }
+
+  th {
+    background: rgba(245, 158, 11, 0.15);
+    color: #F59E0B;
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 2px solid rgba(245, 158, 11, 0.3);
+  }
+
+  td {
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  td strong { color: #FDE68A; }
+
+  .branch {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin: 12px 0;
+  }
+
+  .branch-item {
+    padding: 14px;
+    border-radius: 10px;
+    font-size: 0.9rem;
+  }
+
+  .branch-ok {
+    background: rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.25);
+    color: #86EFAC;
+  }
+
+  .branch-ng {
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.25);
+    color: #FDE68A;
+  }
+
+  .checklist {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .checklist li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    font-size: 0.95rem;
+  }
+
+  .checklist li:last-child { border-bottom: none; }
+
+  .check-box {
+    width: 22px;
+    height: 22px;
+    border: 2px solid rgba(245, 158, 11, 0.4);
+    border-radius: 6px;
+    flex-shrink: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+
+  .check-box.checked {
+    background: #F59E0B;
+    border-color: #F59E0B;
+  }
+
+  .check-box.checked::after {
+    content: '✓';
+    color: #0F172A;
+    font-weight: 800;
+    font-size: 0.8rem;
+  }
+
+  .check-cmd {
+    font-family: 'SF Mono', monospace;
+    font-size: 0.8rem;
+    color: #64748B;
+  }
+
+  .divider {
+    border: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    margin: 40px 0;
+  }
+
+  .done-banner {
+    text-align: center;
+    padding: 40px;
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(34, 197, 94, 0.1));
+    border: 1px solid rgba(245, 158, 11, 0.2);
+    border-radius: 16px;
+    margin-top: 32px;
+  }
+
+  .done-banner h2 {
+    color: #F59E0B;
+    font-size: 1.5rem;
+    margin-bottom: 12px;
+  }
+
+  .footer {
+    text-align: center;
+    color: #475569;
+    font-size: 0.8rem;
+    margin-top: 48px;
+  }
+
+  kbd {
+    background: #1E293B;
+    border: 1px solid #334155;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-family: 'SF Mono', monospace;
+    font-size: 0.85em;
+    color: #E2E8F0;
+  }
+
+  code {
+    background: #1E293B;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'SF Mono', monospace;
+    font-size: 0.9em;
+    color: #FDE68A;
+  }
+
+  .highlight-section {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.05), rgba(245, 158, 11, 0.05));
+    border: 1px dashed rgba(34, 197, 94, 0.3);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 16px 0;
+  }
+
+  .highlight-section p {
+    color: #86EFAC;
+    font-size: 1rem;
+    margin: 0;
+  }
+
+  .vscode-steps img {
+    max-width: 100%;
+    border-radius: 8px;
+    margin: 8px 0;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <h1>Claude Code セットアップ講座</h1>
+  <div class="goal">今日のゴール: <strong>Claude Codeを自分のパソコンに入れて、使えるようにする</strong></div>
+
+  <!-- ターミナルを開く -->
+  <div class="step">
+    <div class="step-header">
+      <span class="step-number prep">準備</span>
+      <h2>ターミナルを開く</h2>
+    </div>
+    <p>ターミナル＝パソコンに文字で命令するための画面です。</p>
+
+    <h3>開き方</h3>
+    <ol>
+      <li>キーボードで <kbd>Cmd ⌘</kbd> と <kbd>スペース</kbd> を同時に押す</li>
+      <li>検索窓が出るので <strong>「ターミナル」</strong> と打つ</li>
+      <li>「ターミナル.app」が出てくるので <strong>Enter</strong></li>
+    </ol>
+    <div class="ok">黒い（または白い）画面が出ればOK。これがターミナルです。</div>
+  </div>
+
+  <!-- STEP 1 -->
+  <div class="step">
+    <div class="step-header">
+      <span class="step-number">STEP 1</span>
+      <h2>Homebrew を入れる</h2>
+    </div>
+    <p><strong>Homebrewって何？</strong><br>
+    Macにソフトを入れるための便利ツール。App Storeのターミナル版みたいなもの。</p>
+
+    <h3>まず、もう入ってないか確認</h3>
+    <div class="cmd">brew --version<button class="copy-btn" onclick="copyCmd(this)">コピー</button></div>
+
+    <div class="branch">
+      <div class="branch-item branch-ok">数字が出た人<br>→ もう入ってるので <strong>STEP 2へ</strong></div>
+      <div class="branch-item branch-ng">command not found と出た人<br>→ <strong>下のコマンドで入れる</strong></div>
+    </div>
+
+    <h3>インストール（入ってなかった人だけ）</h3>
+    <p>下の1行をまるごとコピーして、ターミナルに貼り付けて、Enter。</p>
+    <div class="cmd">/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"<button class="copy-btn" onclick="copyCmd(this)">コピー</button></div>
+
+    <h4>ここでよくあること</h4>
+    <div class="warn">
+      <strong>「Password:」と出て止まった！</strong><br>
+      Macのログインパスワードを打ってください。<br>
+      <strong>打っても画面には何も表示されません。</strong>見えないけどちゃんと入力できてます。打ったらEnter。
+    </div>
+    <div class="info">
+      <strong>しばらく待つ（3〜10分）</strong><br>
+      ダウンロード中です。動いてるので放置でOK。
+    </div>
+
+    <h4>インストールが終わったら</h4>
+    <p>画面の最後の方に <strong>「Next steps:」</strong> と書いてあるはず。<br>
+    その下に表示されている <strong>2〜3行のコマンドをそのままコピペして実行</strong> してください。</p>
+    <p>人によって違いますが、だいたいこんな感じ：</p>
+    <div class="cmd">echo >> ~/.zprofile
+echo 'eval "$(/opt/homebrew/bin/brew shellpath)"' >> ~/.zprofile
+eval "$(/opt/homebrew/bin/brew shellpath)"</div>
+
+    <h4>確認</h4>
+    <div class="cmd">brew --version<button class="copy-btn" onclick="copyCmd(this)">コピー</button></div>
+    <div class="ok"><code>Homebrew 4.x.x</code> みたいに数字が出ればOK！</div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="step">
+    <div class="step-header">
+      <span class="step-number">STEP 2</span>
+      <h2>node を入れる</h2>
+    </div>
+    <p>Claude Codeを動かすために必要なソフトです。</p>
+    <div class="cmd">brew install node<button class="copy-btn" onclick="copyCmd(this)">コピー</button></div>
+    <p>1〜2分で終わります。</p>
+
+    <h4>確認</h4>
+    <div class="cmd">node --version<button class="copy-btn" onclick="copyCmd(this)">コピー</button></div>
+    <div class="ok"><code>v22.x.x</code> みたいに数字が出ればOK！</div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="step">
+    <div class="step-header">
+      <span class="step-number">STEP 3</span>
+      <h2>VSCode を入れる</h2>
+    </div>
+    <p><strong>VSCodeって何？</strong><br>
+    プログラマーがよく使うエディタ（メモ帳の超高機能版）。Claude Codeもこの中で使います。</p>
+
+    <h3>3-1. VSCode本体をインストール</h3>
+    <div class="cmd">brew install --cask visual-studio-code<button class="copy-btn" onclick="copyCmd(this)">コピー</button></div>
+    <p>1〜3分で終わります。</p>
+
+    <h3>3-2. VSCodeを開く</h3>
+    <div class="cmd">code .<button class="copy-btn" onclick="copyCmd(this)">コピー</button></div>
+    <div class="warn">
+      <strong>「code が見つからない」と出た場合</strong><br>
+      <kbd>Cmd ⌘</kbd> + <kbd>スペース</kbd> → 「Visual Studio Code」と打って直接開いてください。
+    </div>
+
+    <h3>3-3. Claude Code 拡張機能を入れる</h3>
+    <ol>
+      <li>VSCodeの左側にある <strong>四角が4つ並んだアイコン</strong>（拡張機能）をクリック</li>
+      <li>検索窓に <strong>「Claude Code」</strong> と入力</li>
+      <li>「Claude Code」（Anthropic公式）が出てくるので <strong>「Install」</strong> をクリック</li>
+    </ol>
+
+    <h3>3-4. Claude Code をインストール＆起動</h3>
+    <p>VSCode内でターミナルを開きます：</p>
+    <p><kbd>Ctrl</kbd> + <kbd>`</kbd>（バッククォート：数字の1の左のキー）</p>
+    <div class="info">VSCodeの下半分にターミナルが出ます。ここからはこのターミナルを使います。</div>
+
+    <p>Claude Codeをインストール：</p>
+    <div class="cmd">npm install -g @anthropic-ai/claude-code<button class="copy-btn" onclick="copyCmd(this)">コピー</button></div>
+
+    <p>起動：</p>
+    <div class="cmd">claude<button class="copy-btn" onclick="copyCmd(this)">コピー</button></div>
+
+    <ol>
+      <li>ブラウザが自動で開く</li>
+      <li><strong>Anthropicアカウント</strong> でログイン（持ってない人はその場で作ってOK）</li>
+      <li>ログインできたら <strong>VSCodeに戻る</strong></li>
+    </ol>
+
+    <h3>動くか試してみよう</h3>
+    <p>Claude Codeの画面に↓を打ってみてください：</p>
+    <div class="cmd">今日の日付を教えて<button class="copy-btn" onclick="copyCmd(this)">コピー</button></div>
+    <div class="ok">日付が返ってきたら <strong>Claude Codeは使えてます！</strong></div>
+
+    <p>一旦 <kbd>Ctrl</kbd> + <kbd>C</kbd> で終了してください。</p>
+  </div>
+
+  <!-- STEP 4 -->
+  <div class="step">
+    <div class="step-header">
+      <span class="step-number ai">STEP 4</span>
+      <h2>残りは Claude Code にやってもらう</h2>
+    </div>
+
+    <div class="highlight-section">
+      <p><strong>ここからが本番。</strong>自分でコマンドを打つのではなく、AIに「やって」と頼むだけ。</p>
+    </div>
+
+    <p>VSCodeのターミナルでもう一度 Claude Code を起動：</p>
+    <div class="cmd">claude<button class="copy-btn" onclick="copyCmd(this)">コピー</button></div>
+
+    <p>起動したら、↓をそのままコピペして送信してください：</p>
+
+    <div class="cmd ai-cmd">
+      <span class="ai-label">Claude Codeに送る</span>以下の3つをやってください。途中で質問せず、全部終わったら結果をまとめて報告してください。
+
+1. GitHub CLI をインストールしてログインする
+   - brew install gh を実行
+   - gh auth login を実行して、ブラウザでログインするよう案内
+   - gh auth status で確認
+
+2. Google Cloud CLI をインストールしてセットアップする
+   - brew install google-cloud-sdk を実行
+   - gcloud init を実行して、ブラウザでGoogleアカウントにログインするよう案内
+   - プロジェクトは「Create a new project」で「my-tools」という名前で作成
+   - gcloud auth application-default login を実行
+   - gcloud services enable sheets.googleapis.com を実行
+
+3. 完了報告
+   全部終わったら以下の形式で報告：
+   - GitHub CLI: OK / NG
+   - Google Cloud CLI: OK / NG
+   - Google Sheets API: OK / NG<button class="copy-btn" onclick="copyCmd(this)">コピー</button></div>
+
+    <div class="ai-box">
+      <strong>Claude Codeが自動で作業を始めます。</strong><br>
+      途中でブラウザが開いたら、ログインしてVSCodeに戻ってください。<br>
+      「Allow」や「Yes」の確認が出たら許可してOKです。
+    </div>
+
+    <div class="warn">
+      <strong>「Permission denied」や「Error」が出た場合</strong><br>
+      慌てなくてOK。Claude Codeが自動で対処してくれることが多いです。<br>
+      どうしても進まない場合は手を挙げてください。
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <!-- 最終チェック -->
+  <div class="done-banner">
+    <h2>全部終わった！おつかれさまでした！</h2>
+    <p style="color: #94A3B8; margin-bottom: 24px;">手元で確認してみてください（クリックでチェック）</p>
+
+    <ul class="checklist">
+      <li><div class="check-box" onclick="toggleCheck(this)"></div> Homebrew <span class="check-cmd">brew --version</span></li>
+      <li><div class="check-box" onclick="toggleCheck(this)"></div> node <span class="check-cmd">node --version</span></li>
+      <li><div class="check-box" onclick="toggleCheck(this)"></div> VSCode <span class="check-cmd">起動できる</span></li>
+      <li><div class="check-box" onclick="toggleCheck(this)"></div> Claude Code <span class="check-cmd">claude --version</span></li>
+      <li><div class="check-box" onclick="toggleCheck(this)"></div> GitHub <span class="check-cmd">gh auth status</span></li>
+      <li><div class="check-box" onclick="toggleCheck(this)"></div> Google Cloud <span class="check-cmd">gcloud auth list</span></li>
+    </ul>
+  </div>
+
+  <p class="footer">Misfits Claude Code講座 — 2026/03/25</p>
+
+</div>
+
+<script>
+function copyCmd(btn) {
+  const cmdEl = btn.parentElement;
+  let text = cmdEl.textContent.replace('コピー', '').replace('OK!', '').trim();
+  const label = cmdEl.querySelector('.ai-label');
+  if (label) {
+    text = text.replace(label.textContent, '').trim();
+  }
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'OK!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = 'コピー';
+      btn.classList.remove('copied');
+    }, 1500);
+  });
+}
+
+function toggleCheck(el) {
+  el.classList.toggle('checked');
+}
+</script>
+
+</body>
+</html>
